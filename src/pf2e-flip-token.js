@@ -13,7 +13,7 @@ function updateToken(hud, idx, path, scale) {
     hud.object.document.update({
         "flags.flip-token.tokens.idx": idx
     });
-    hud.object.document.update({"img": path, "scale": scale});
+    hud.object.document.update({"texture.src": path, "scale": scale});
 }
 
 Hooks.on("renderTokenConfig", async (app, $html) => {
