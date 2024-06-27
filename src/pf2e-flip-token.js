@@ -8,12 +8,13 @@ const SOURCE_MENU_ITEM = (img, tooltip) => {
 	</button>`;
 };
 
-function updateToken(hud, idx, path, scale) {
+async function updateToken(hud, idx, path, scale) {
     if (!scale) {scale = 1;}
-    hud.object.document.update({
-        "flags.flip-token.tokens.idx": idx
+    await hud.object.document.update({
+        "flags.flip-token.tokens.idx": idx,
+        "texture.src": path,
+        "scale": scale
     });
-    hud.object.document.update({"texture.src": path, "scale": scale});
 }
 
 Hooks.on("renderTokenConfig", async (app, $html) => {
@@ -41,9 +42,9 @@ Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
         if (values) {
             let idx = hud.object.document.flags?.['flip-token']?.['tokens']?.['idx'];
             if ((idx +1) < values.length) {
-                updateToken(hud, (idx +1), values[idx + 1].path, values[idx + 1]?.scale ?? 1)
+                await updateToken(hud, (idx +1), values[idx + 1].path, values[idx + 1]?.scale ?? 1)
             } else {
-                updateToken(hud, 0, values[0].path, values[0]?.scale ?? 1)
+                await updateToken(hud, 0, values[0].path, values[0]?.scale ?? 1)
             }
         }
     });
@@ -59,7 +60,7 @@ Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
         icon.src = value.path;
         picture.append(icon);
         $(picture).find('img').click(async (event) => {
-            updateToken(hud, i, value.path, value?.scale ?? 1)
+            await updateToken(hud, i, value.path, value?.scale ?? 1)
         });
 
         tbutton.find(".flip-tokens").append(picture);

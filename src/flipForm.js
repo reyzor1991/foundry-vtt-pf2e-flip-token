@@ -37,14 +37,9 @@ export default class FlipFormApplication extends FormApplication {
     close() {
         super.close();
         this.object.object.update({
-            "flags.flip-token.tokens.values": this.paths
+            "flags.flip-token.tokens.values": this.paths,
+            "flags.flip-token.tokens.idx": 0,
         });
-        this.object.object.update({
-            "flags.flip-token.tokens.idx": 0
-        });
-        if (this.paths.length > 0) {
-            this.object.actor.update({"img": this.paths[0].path});
-        }
     }
 
   activateListeners(html) {
