@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.0.6
+- Add animation for changing token
+
 ## Version 0.0.5
 - Optimize image changing
 

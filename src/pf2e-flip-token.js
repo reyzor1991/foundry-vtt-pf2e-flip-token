@@ -14,6 +14,11 @@ async function updateToken(hud, idx, path, scale) {
         "flags.flip-token.tokens.idx": idx,
         "texture.src": path,
         "scale": scale
+    }, {
+        animation: {
+            transition: "morph",
+            duration: 500
+        }
     });
 }
 
