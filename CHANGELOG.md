@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.0
+- Fix scaling
+
 ## Version 0.0.6
 - Add animation for changing token
 

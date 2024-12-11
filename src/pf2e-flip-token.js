@@ -1,19 +1,14 @@
 import FlipFormApplication from "./flipForm.js";
 
 const BUTTON_HTML = `<div class="control-icon" data-action="flip"><i class="fas fa-repeat"></i><div class="flip-tokens"></div></div>`;
-const SOURCE_MENU = `<div class="control-icon flip-source-menu"></div>`;
-const SOURCE_MENU_ITEM = (img, tooltip) => {
-  return `<button type="button" class="flip-source-menu-item" >
-	  <img src="${img}" title="${tooltip}" />
-	</button>`;
-};
 
 async function updateToken(hud, idx, path, scale) {
     if (!scale) {scale = 1;}
     await hud.object.document.update({
         "flags.flip-token.tokens.idx": idx,
         "texture.src": path,
-        "scale": scale
+        "texture.scaleX": scale,
+        "texture.scaleY": scale
     }, {
         animation: {
             transition: "morph",
@@ -34,7 +29,6 @@ Hooks.on("renderTokenConfig", async (app, $html) => {
 
 Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
     let tbutton = $(BUTTON_HTML);
-    let token = hud.object.document;
     tbutton.find(".fa-repeat").contextmenu(async (event) => {
         event.preventDefault();
         event.stopPropagation();
