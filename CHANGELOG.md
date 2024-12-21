@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.1
+- Update Portrait of actor
+
 ## Version 0.1.0
 - Fix scaling
 
