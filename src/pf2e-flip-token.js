@@ -7,7 +7,6 @@ async function updateToken(hud, idx, path, scale, portrait) {
         scale = 1;
     }
     await hud.object.document.update({
-        "flags.flip-token.tokens.idx": idx,
         "texture.src": path,
         "texture.scaleX": scale,
         "texture.scaleY": scale
@@ -17,12 +16,20 @@ async function updateToken(hud, idx, path, scale, portrait) {
             duration: 500
         }
     });
+    await hud.object.document.actor.update({
+        "flags.pf2e-flip-token.tokens.idx": idx,
+    })
     if (portrait) {
-        await hud.object.document.actor.update({img: portrait})
+        await hud.object.document.actor.update({
+            img: portrait
+        })
     }
 }
 
 Hooks.on("renderTokenConfig", async (app, $html) => {
+    if (!app.object?.actor) {
+        return;
+    }
     let tbutton = $('<button type="submit" class="flip-config"><i class="far fa-repeat"></i>Flip Config</button>');
     tbutton.click(async (event) => {
         event.preventDefault();
@@ -42,9 +49,9 @@ Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
     tbutton.find(".fa-repeat").click(async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        let values = hud.object.document.flags?.['flip-token']?.['tokens']?.['values'];
+        let values = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.values;
         if (values) {
-            let idx = hud.object.document.flags?.['flip-token']?.['tokens']?.['idx'];
+            let idx = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.idx;
             if ((idx + 1) < values.length) {
                 await updateToken(hud, (idx + 1), values[idx + 1].path, values[idx + 1]?.scale ?? 1, values[idx + 1].portrait)
             } else {
@@ -53,7 +60,7 @@ Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
         }
     });
 
-    let values = hud.object.document.flags?.['flip-token']?.['tokens']?.['values'] ?? [];
+    let values = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.values ?? [];
     values.forEach(function (value, i) {
         const picture = document.createElement("picture");
         picture.classList.add("flip-token");

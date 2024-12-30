@@ -2,7 +2,7 @@ export default class FlipFormApplication extends FormApplication {
     constructor(tokenDocument) {
         super();
         this.tokenDocument = tokenDocument;
-        this.paths = this.tokenDocument.flags?.['flip-token']?.['tokens']?.['values']
+        this.paths = this.tokenDocument.actor.getFlag('pf2e-flip-token', 'tokens')?.values
             ?? [{
                 "path": this.tokenDocument.texture.src,
                 "portrait": this.tokenDocument.actor.img,
@@ -42,47 +42,47 @@ export default class FlipFormApplication extends FormApplication {
 
     close() {
         super.close();
-        this.tokenDocument.update({
-            "flags.flip-token.tokens.values": this.paths,
-            "flags.flip-token.tokens.idx": 0,
+        this.tokenDocument.actor.setFlag('pf2e-flip-token', 'tokens', {
+            "values": this.paths,
+            "idx": 0,
         });
     }
 
     activateListeners(html) {
         super.activateListeners(html);
         html.find('.flip-save').click(async (event) => {
-            this._updateObject('addRow', {path: '', 'scale': 1});
+            await this._updateObject('addRow', {path: '', 'scale': 1});
         });
         html.find('.flip-delete').click(async (event) => {
-            this._updateObject('deleteRow', null, $(event.currentTarget).data().idx);
+            await this._updateObject('deleteRow', null, $(event.currentTarget).data().idx);
         });
         html.find('input.image').change(async (event) => {
-            this._updateObject('updatePath', event.target.value, $(event.currentTarget).data().idx);
+            await this._updateObject('updatePath', event.target.value, $(event.currentTarget).data().idx);
         });
         html.find('input.portrait').change(async (event) => {
-            this._updateObject('updatePortrait', event.target.value, $(event.currentTarget).data().idx);
+            await this._updateObject('updatePortrait', event.target.value, $(event.currentTarget).data().idx);
         });
         html.find('input.scale-value').change(async (event) => {
-            this._updateObject('updateScale', event.target.value, $(event.currentTarget).data().idx);
+            await this._updateObject('updateScale', event.target.value, $(event.currentTarget).data().idx);
         });
     }
 
     async _updateObject(event, val, idx) {
-        if (event == 'addRow') {
+        if (event === 'addRow') {
             this.paths.push(val)
             this.values = this.getPathObjs();
             super.render()
-        } else if (event == 'deleteRow') {
+        } else if (event === 'deleteRow') {
             this.paths.splice(idx, 1);
             this.values = this.getPathObjs();
             super.render()
-        } else if (event == 'updatePath') {
+        } else if (event === 'updatePath') {
             this.paths[idx].path = val;
             this.values = this.getPathObjs();
-        } else if (event == 'updatePortrait') {
+        } else if (event === 'updatePortrait') {
             this.paths[idx].portrait = val;
             this.values = this.getPathObjs();
-        } else if (event == 'updateScale') {
+        } else if (event === 'updateScale') {
             this.paths[idx].scale = parseFloat(val);
             this.values = this.getPathObjs();
         }
