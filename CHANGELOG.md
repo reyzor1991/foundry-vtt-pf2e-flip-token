@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.2
+- Move flags to actor. Need to reset configuration manually
+
 ## Version 0.1.1
 - Update Portrait of actor
 
