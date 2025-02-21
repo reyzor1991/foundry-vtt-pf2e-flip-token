@@ -1,12 +1,16 @@
-import FlipFormApplication from "./flipForm.js";
+import {FlipBattleFormApplication, FlipFormApplication} from "./flipForm.js";
 
 const BUTTON_HTML = `<div class="control-icon" data-action="flip"><i class="fas fa-repeat"></i><div class="flip-tokens"></div></div>`;
 
 async function updateToken(hud, idx, path, scale, portrait) {
+    updateTokenDocument(hud.object.document, idx, path, scale, portrait);
+}
+
+async function updateTokenDocument(tokenDocument, idx, path, scale, portrait) {
     if (!scale) {
         scale = 1;
     }
-    await hud.object.document.update({
+    await tokenDocument.update({
         "texture.src": path,
         "texture.scaleX": scale,
         "texture.scaleY": scale
@@ -16,11 +20,11 @@ async function updateToken(hud, idx, path, scale, portrait) {
             duration: 500
         }
     });
-    await hud.object.document.actor.update({
+    await tokenDocument.actor.update({
         "flags.pf2e-flip-token.tokens.idx": idx,
     })
     if (portrait) {
-        await hud.object.document.actor.update({
+        await tokenDocument.actor.update({
             img: portrait
         })
     }
@@ -31,11 +35,18 @@ Hooks.on("renderTokenConfig", async (app, $html) => {
         return;
     }
     let tbutton = $('<button type="submit" class="flip-config"><i class="far fa-repeat"></i>Flip Config</button>');
+    let battleButton = $('<button type="submit" class="flip-config-battle"><i class="far fa-repeat"></i>Flip Battle Config</button>');
     tbutton.click(async (event) => {
         event.preventDefault();
         event.stopPropagation();
         new FlipFormApplication(app.object).render(true);
     });
+    battleButton.click(async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        new FlipBattleFormApplication(app.object).render(true);
+    });
+    $html.find(".tab[data-tab='character']").prepend(battleButton);
     $html.find(".tab[data-tab='character']").prepend(tbutton);
 });
 
@@ -78,4 +89,46 @@ Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
     });
 
     hudHtml.find(".col.right").append(tbutton);
+});
+
+function updateBattleToken(tokenDocument, path, scale, portrait) {
+    if (!scale) {
+        scale = 1;
+    }
+    tokenDocument.update({
+        "texture.src": path,
+        "texture.scaleX": scale,
+        "texture.scaleY": scale
+    }, {
+        animation: {
+            transition: "morph",
+            duration: 500
+        }
+    });
+
+    if (portrait) {
+        tokenDocument.actor.update({
+            img: portrait
+        })
+    }
+}
+
+Hooks.on("combatStart", async (combat) => {
+    combat.turns.forEach(c => {
+        let battle = c.actor.getFlag('pf2e-flip-token', 'battle');
+        if (battle) {
+            let {path, scale, portrait} = battle?.inCombat;
+            updateBattleToken(c.token, path, scale, portrait);
+        }
+    })
+});
+
+Hooks.on("deleteCombat", async (combat) => {
+    combat.turns.forEach(c => {
+        let battle = c.actor.getFlag('pf2e-flip-token', 'battle');
+        if (battle) {
+            let {path, scale, portrait} = battle?.atRest;
+            updateBattleToken(c.token, path, scale, portrait);
+        }
+    })
 });

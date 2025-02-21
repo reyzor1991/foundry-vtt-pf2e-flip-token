@@ -1,4 +1,5 @@
-# Changelog
+## Version 0.1.3
+- Add atCombat/atRest configs
 
 ## Version 0.1.2
 - Move flags to actor. Need to reset configuration manually

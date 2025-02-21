@@ -1,4 +1,4 @@
-export default class FlipFormApplication extends FormApplication {
+class FlipFormApplication extends FormApplication {
     constructor(tokenDocument) {
         super();
         this.tokenDocument = tokenDocument;
@@ -89,3 +89,72 @@ export default class FlipFormApplication extends FormApplication {
     }
 }
 
+class FlipBattleFormApplication extends FormApplication {
+    constructor(tokenDocument) {
+        super();
+        this.tokenDocument = tokenDocument;
+        let battle = this.tokenDocument.actor.getFlag('pf2e-flip-token', 'battle');
+        this.inCombat = battle?.inCombat || {
+            "path": this.tokenDocument.texture.src,
+            "portrait": this.tokenDocument.actor.img,
+            'scale': 1
+        };
+        this.atRest = battle?.asRest || {
+            "path": this.tokenDocument.texture.src,
+            "portrait": this.tokenDocument.actor.img,
+            'scale': 1
+        };
+    }
+
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            classes: ['form'],
+            popOut: true,
+            template: `modules/pf2e-flip-token/templates/battle.hbs`,
+            id: 'flip-form-application',
+            width: '400',
+            height: '300',
+            title: "Flip Battle Config",
+        });
+    }
+
+    getData() {
+        return {
+            inCombat: this.inCombat,
+            atRest: this.atRest,
+        };
+    }
+
+    close() {
+        super.close();
+
+        this.tokenDocument.actor.setFlag('pf2e-flip-token', 'battle', {
+            inCombat: this.inCombat,
+            atRest: this.atRest,
+        });
+    }
+
+    activateListeners(html) {
+        super.activateListeners(html);
+
+        html.find('input.image').change(async (event) => {
+            await this._updateObject('path', event.target.value, $(event.currentTarget).data().type);
+        });
+        html.find('input.portrait').change(async (event) => {
+            await this._updateObject('portrait', event.target.value, $(event.currentTarget).data().type);
+        });
+        html.find('input.scale-value').change(async (event) => {
+            await this._updateObject('scale', event.target.value, $(event.currentTarget).data().type);
+        });
+
+    }
+
+    async _updateObject(event, val, idx) {
+        this[idx][event] = val;
+    }
+}
+
+export {
+    FlipFormApplication,
+    FlipBattleFormApplication,
+}
