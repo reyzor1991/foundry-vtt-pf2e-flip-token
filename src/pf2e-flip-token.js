@@ -30,27 +30,30 @@ async function updateTokenDocument(tokenDocument, idx, path, scale, portrait) {
     }
 }
 
-Hooks.on("renderTokenConfig", async (app, $html) => {
-    if (!app.object?.actor) {
+Hooks.on("renderTokenConfig", async (app, html) => {
+    if (!app.document?.actor) {
         return;
     }
+    let $html = $(html)
     let tbutton = $('<button type="submit" class="flip-config"><i class="far fa-repeat"></i>Flip Config</button>');
     let battleButton = $('<button type="submit" class="flip-config-battle"><i class="far fa-repeat"></i>Flip Battle Config</button>');
     tbutton.click(async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        new FlipFormApplication(app.object).render(true);
+        new FlipFormApplication(app.document).render(true);
     });
     battleButton.click(async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        new FlipBattleFormApplication(app.object).render(true);
+        new FlipBattleFormApplication(app.document).render(true);
     });
-    $html.find(".tab[data-tab='character']").prepend(battleButton);
-    $html.find(".tab[data-tab='character']").prepend(tbutton);
+    $html.find(".tab[data-tab='identity']").prepend(battleButton);
+    $html.find(".tab[data-tab='identity']").prepend(tbutton);
 });
 
-Hooks.on("renderTokenHUD", (hud, hudHtml, hudData) => {
+Hooks.on("renderTokenHUD", (hud, _hudHtml, hudData) => {
+    let hudHtml = $(_hudHtml)
+
     let tbutton = $(BUTTON_HTML);
     tbutton.find(".fa-repeat").contextmenu(async (event) => {
         event.preventDefault();

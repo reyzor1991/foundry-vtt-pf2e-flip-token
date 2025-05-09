@@ -44,7 +44,7 @@ Open Game License:
 [Minimum Foundry 10]: https://img.shields.io/badge/Minimum%20Foundry-10.291-informational?style=flat-square
 [Verified Foundry 12]: https://img.shields.io/badge/Verified%20Foundry-10.291-informational?style=flat-square
 
-[Version]: https://img.shields.io/badge/Version-0.1.3-yellow?style=flat-square
+[Version]: https://img.shields.io/badge/Version-0.2.0-yellow?style=flat-square
 [Version URL]: https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token
 
 [GitHub Release Date]: https://img.shields.io/github/release-date/reyzor1991/foundry-vtt-pf2e-flip-token

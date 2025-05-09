@@ -1,3 +1,6 @@
+## Version 0.2.0
+- v13
+
 ## Version 0.1.3
 - Add atCombat/atRest configs
 
