@@ -1,8 +1,8 @@
 {
   "id": "pf2e-flip-token",
-  "title": "PF2e Flip Token",
+  "title": "Foundry Flip Token",
   "description": "Flip image of token",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "authors": [
     {
       "name": "reyzor1991",
@@ -26,19 +26,9 @@
   "changelog": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/blob/main/CHANGELOG.md",
   "compatibility": {
     "minimum": "13.342",
-    "verified": "13.342"
+    "verified": "13.345"
   },
   "relationships": {
-    "systems": [
-      {
-        "id": "pf2e",
-        "type": "system",
-        "manifest": "https://github.com/foundryvtt/pf2e/releases/download/latest/system.json",
-        "compatibility": {
-          "minimum": "7.0.5",
-          "verified": "7.0.5"
-        }
-      }
-    ]
+    "systems": []
   }
 }
