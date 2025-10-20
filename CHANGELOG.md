@@ -1,3 +1,6 @@
+## Version 0.3.1
+- Add name to flip setting
+
 ## Version 0.3.0
 - Make module as system agnostic
 

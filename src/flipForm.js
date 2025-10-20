@@ -1,11 +1,14 @@
 class FlipFormApplication extends FormApplication {
     constructor(tokenDocument) {
         super();
-        this.tokenDocument = tokenDocument;
-        this.paths = this.tokenDocument.actor.getFlag('pf2e-flip-token', 'tokens')?.values
+
+        this.actorDocument = tokenDocument instanceof Actor ? tokenDocument : tokenDocument?.actor;
+
+        this.paths = this.actorDocument.getFlag('pf2e-flip-token', 'tokens')?.values
             ?? [{
-                "path": this.tokenDocument.texture.src,
-                "portrait": this.tokenDocument.actor.img,
+                "path": this.actorDocument.prototypeToken.texture.src,
+                "portrait": this.actorDocument.img,
+                "name": this.actorDocument.prototypeToken.name,
                 'scale': 1
             }];
         this.values = this.getPathObjs();
@@ -19,6 +22,7 @@ class FlipFormApplication extends FormApplication {
                 'targetP': 'flipPortrait-' + index,
                 'path': ce.path,
                 'portrait': ce.portrait,
+                'name': ce.name,
                 'scale': ce.scale ?? 1
             };
         });
@@ -42,7 +46,7 @@ class FlipFormApplication extends FormApplication {
 
     close() {
         super.close();
-        this.tokenDocument.actor.setFlag('pf2e-flip-token', 'tokens', {
+        this.actorDocument.setFlag('pf2e-flip-token', 'tokens', {
             "values": this.paths,
             "idx": 0,
         });
@@ -51,7 +55,7 @@ class FlipFormApplication extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
         html.find('.flip-save').click(async (event) => {
-            await this._updateObject('addRow', {path: '', 'scale': 1});
+            await this._updateObject('addRow', {path: '', 'scale': 1, name: ''});
         });
         html.find('.flip-delete').click(async (event) => {
             await this._updateObject('deleteRow', null, $(event.currentTarget).data().idx);
@@ -64,6 +68,9 @@ class FlipFormApplication extends FormApplication {
         });
         html.find('input.scale-value').change(async (event) => {
             await this._updateObject('updateScale', event.target.value, $(event.currentTarget).data().idx);
+        });
+        html.find('input.name').change(async (event) => {
+            await this._updateObject('updateName', event.target.value, $(event.currentTarget).data().idx);
         });
     }
 
@@ -85,6 +92,9 @@ class FlipFormApplication extends FormApplication {
         } else if (event === 'updateScale') {
             this.paths[idx].scale = parseFloat(val);
             this.values = this.getPathObjs();
+        } else if (event === 'updateName') {
+            this.paths[idx].name = val;
+            this.values = this.getPathObjs();
         }
     }
 }
@@ -92,16 +102,20 @@ class FlipFormApplication extends FormApplication {
 class FlipBattleFormApplication extends FormApplication {
     constructor(tokenDocument) {
         super();
-        this.tokenDocument = tokenDocument;
-        let battle = this.tokenDocument.actor.getFlag('pf2e-flip-token', 'battle');
+
+        this.actorDocument = tokenDocument instanceof Actor ? tokenDocument : tokenDocument?.actor;
+
+        let battle = this.actorDocument.getFlag('pf2e-flip-token', 'battle');
         this.inCombat = battle?.inCombat || {
-            "path": this.tokenDocument.texture.src,
-            "portrait": this.tokenDocument.actor.img,
+            "path": this.actorDocument.prototypeToken.texture.src,
+            "portrait": this.actorDocument.img,
+            "name": this.actorDocument.prototypeToken.name,
             'scale': 1
         };
-        this.atRest = battle?.asRest || {
-            "path": this.tokenDocument.texture.src,
-            "portrait": this.tokenDocument.actor.img,
+        this.atRest = battle?.atRest || {
+            "path": this.actorDocument.prototypeToken.texture.src,
+            "portrait": this.actorDocument.img,
+            "name": this.actorDocument.prototypeToken.name,
             'scale': 1
         };
     }
@@ -145,6 +159,9 @@ class FlipBattleFormApplication extends FormApplication {
         });
         html.find('input.scale-value').change(async (event) => {
             await this._updateObject('scale', event.target.value, $(event.currentTarget).data().type);
+        });
+        html.find('input.name').change(async (event) => {
+            await this._updateObject('name', event.target.value, $(event.currentTarget).data().type);
         });
 
     }
