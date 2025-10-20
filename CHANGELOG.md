@@ -1,5 +1,6 @@
 ## Version 0.3.1
 - Add name to flip setting
+- Set config in prototype token
 
 ## Version 0.3.0
 - Make module as system agnostic
