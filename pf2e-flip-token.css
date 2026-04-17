@@ -40,3 +40,9 @@
 #token-hud .flip-tokens.active {
     visibility: visible;
 }
+
+#flip-battle-form-application, #flip-form-application {
+    .form-fields {
+        display: flex;
+    }
+}

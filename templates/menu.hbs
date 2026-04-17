@@ -1,31 +1,33 @@
-<form autocomplete="off">
+<div class="scrollable">
 
     {{#each values as |value|}}
         <fieldset class="row">
             <div class="form-group">
                 <label>Name</label>
-                <input class="name" type="text" name="name" data-type="String" value="{{value.name}}" data-idx={{value.idx}}>
+                <div class="form-fields">
+                    <input class="name" type="text" name="name" data-type="String" value="{{value.name}}" data-idx={{value.idx}}>
+                    <button type="button" class="flip-delete" data-idx={{value.idx}}><i class="fas fa-trash"></i></button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Image path</label>
                 <div class="form-fields">
-                  {{filePicker target=value.target type="imagevideo"}}
-                  <input class="image" type="text" name={{value.target}} data-idx={{value.idx}} placeholder="path/image.png" value="{{value.path}}">
-                  <button type="button" class="flip-delete" data-idx={{value.idx}}><i class="fas fa-trash"></i></button>
+                    <file-picker class="image" name={{value.target}} type="imagevideo" value="{{value.path}}"
+                                 data-idx={{value.idx}}></file-picker>
                 </div>
             </div>
             <div class="form-group">
                 <label>Portrait path</label>
                 <div class="form-fields">
-                  {{filePicker target=value.targetP type="imagevideo"}}
-                  <input class="portrait" type="text" name={{value.targetP}} data-idx={{value.idx}} placeholder="path/image.png" value="{{value.portrait}}">
-                  <button type="button" class="flip-delete" data-idx={{value.idx}}><i class="fas fa-trash"></i></button>
+                    <file-picker class="portrait" name={{value.targetP}} type="imagevideo" value="{{value.portrait}}"
+                                 data-idx={{value.idx}}></file-picker>
                 </div>
             </div>
             <div class="form-group scale">
                 <label>Scale</label>
                 <div class="form-fields">
-                    <input type="range" name="scale" value={{value.scale}} min="0.2" max="3.0" step="0.1" class="scale-value" data-idx={{value.idx}}>
+                    <input type="range" name="scale" value={{value.scale}} min="0.2" max="3.0" step="0.1" class="scale-value"
+                           data-idx={{value.idx}}>
                     <span class="range-value">{{value.scale}}</span>
                 </div>
             </div>
@@ -36,4 +38,4 @@
     <footer class="sheet-footer flexrow">
         <button type="button" class="flip-save"><i class="fas fa-add"></i>Add token image</button>
     </footer>
-</form>
+</div>

@@ -2,7 +2,7 @@
   "id": "pf2e-flip-token",
   "title": "Foundry Flip Token",
   "description": "Flip image of token",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "authors": [
     {
       "name": "reyzor1991",
@@ -17,16 +17,17 @@
   "styles": [
     "pf2e-flip-token.css"
   ],
-  "manifest": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/releases/latest/download/module.json",
-  "download": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/releases/latest/download/pf2e-flip-token.zip",
+  "manifest": "https://raw.githubusercontent.com/reyzor1991/foundry-vtt-pf2e-flip-token/refs/heads/master/module.json",
+  "download": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/releases/download/0.4.0/pf2e-flip-token.zip",
   "url": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token",
   "license": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/blob/main/LICENSE",
   "readme": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/blob/main/README.md",
   "bugs": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/issues",
   "changelog": "https://github.com/reyzor1991/foundry-vtt-pf2e-flip-token/blob/main/CHANGELOG.md",
   "compatibility": {
-    "minimum": "13.342",
-    "verified": "13.345"
+    "minimum": "14.360",
+    "verified": "14.360",
+    "maximum": "14.999"
   },
   "relationships": {
     "systems": []

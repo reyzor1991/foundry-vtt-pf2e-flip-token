@@ -1,3 +1,6 @@
+## Version 0.4.0
+- v14
+
 ## Version 0.3.1
 - Add name to flip setting
 - Set config in prototype token

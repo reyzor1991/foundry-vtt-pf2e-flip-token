@@ -9,16 +9,14 @@
         <div class="form-group">
             <label>Image path</label>
             <div class="form-fields">
-                {{filePicker target="atRestImage" type="imagevideo"}}
-                <input class="image" type="text" name="atRestImage" data-type="atRest" placeholder="path/image.png" value="{{atRest.path}}">
+                <file-picker class="image" name="atRestImage" type="imagevideo" value="{{atRest.path}}" data-type="atRest"></file-picker>
                 <button type="button" class="flip-delete" data-type="atRest"><i class="fas fa-trash"></i></button>
             </div>
         </div>
         <div class="form-group">
             <label>Portrait path</label>
             <div class="form-fields">
-                {{filePicker target="atRestImageP" type="imagevideo"}}
-                <input class="portrait" type="text" name="atRestImageP" data-type="atRest" placeholder="path/image.png" value="{{atRest.portrait}}">
+                <file-picker class="portrait" name="atRestImageP" type="imagevideo" value="{{atRest.portrait}}" data-type="atRest"></file-picker>
                 <button type="button" class="flip-delete" data-type="atRest"><i class="fas fa-trash"></i></button>
             </div>
         </div>
@@ -40,16 +38,14 @@
         <div class="form-group">
             <label>Image path</label>
             <div class="form-fields">
-                {{filePicker target="inCombatImage" type="imagevideo"}}
-                <input class="image" type="text" name="inCombatImage" data-type="inCombat" placeholder="path/image.png" value="{{inCombat.path}}">
+                <file-picker class="image" name="inCombatImage" type="imagevideo" value="{{inCombat.path}}" data-type="inCombat"></file-picker>
                 <button type="button" class="flip-delete" data-type="inCombat"><i class="fas fa-trash"></i></button>
             </div>
         </div>
         <div class="form-group">
             <label>Portrait path</label>
             <div class="form-fields">
-                {{filePicker target="inCombatImageP" type="imagevideo"}}
-                <input class="portrait" type="text" name="inCombatImageP" data-type="inCombat" placeholder="path/image.png" value="{{inCombat.portrait}}">
+                <file-picker class="portrait" name="inCombatImageP" type="imagevideo" value="{{inCombat.portrait}}" data-type="inCombat"></file-picker>
                 <button type="button" class="flip-delete" data-type="inCombat"><i class="fas fa-trash"></i></button>
             </div>
         </div>

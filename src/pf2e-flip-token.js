@@ -1,190 +1,199 @@
 import {FlipBattleFormApplication, FlipFormApplication} from "./flipForm.js";
 
-const BUTTON_HTML = `<div class="control-icon" data-action="flip"><i class="fas fa-repeat"></i><div class="flip-tokens"></div></div>`;
+function getActorDocument(tokenOrActorDocument) {
+    return tokenOrActorDocument instanceof Actor ? tokenOrActorDocument : tokenOrActorDocument?.actor;
+}
 
-async function updateToken(hud, idx, path, scale, portrait, name) {
-    updateTokenDocument(hud.object.document, idx, path, scale, portrait, name);
+function getDefaultAnimation() {
+    return {
+        animation: {
+            transition: "morph",
+            duration: 500
+        }
+    };
+}
+
+async function applyTokenAppearance(tokenDocument, path, scale = 1, portrait, name) {
+    if (!tokenDocument) {
+        return;
+    }
+
+    if (tokenDocument?.ring?.enabled) {
+        await tokenDocument.update({
+            "ring.subject": {
+                scale,
+                texture: path
+            },
+        }, getDefaultAnimation());
+    } else {
+        await tokenDocument.update({
+            "texture.src": path,
+            "texture.scaleX": scale,
+            "texture.scaleY": scale
+        }, getDefaultAnimation());
+    }
+
+    if (portrait) {
+        await tokenDocument.actor?.update({img: portrait});
+    }
+
+    if (name) {
+        await tokenDocument.update({name});
+    }
 }
 
 async function updateTokenDocument(tokenDocument, idx, path, scale, portrait, name) {
-    if (!scale) {
-        scale = 1;
-    }
-
-    if (tokenDocument?.ring?.enabled) {
-        tokenDocument.update({
-            "ring.subject": {
-                "scale": scale,
-                "texture": path
-            },
-        }, {
-            animation: {
-                transition: "morph",
-                duration: 500
-            }
-        });
-    } else {
-        tokenDocument.update({
-            "texture.src": path,
-            "texture.scaleX": scale,
-            "texture.scaleY": scale
-        }, {
-            animation: {
-                transition: "morph",
-                duration: 500
-            }
-        });
-    }
-
-    await tokenDocument.actor.update({
+    await applyTokenAppearance(tokenDocument, path, scale ?? 1, portrait, name);
+    await tokenDocument?.actor?.update({
         "flags.pf2e-flip-token.tokens.idx": idx,
-    })
-    if (portrait) {
-        await tokenDocument.actor.update({
-            img: portrait
-        })
-    }
-    if (name) {
-        await tokenDocument.update({
-            name: name
-        })
-    }
+    });
 }
 
-function _renderConfig(app, html) {
-    let $html = $(html)
-    let tbutton = $('<button type="submit" class="flip-config"><i class="far fa-repeat"></i>Flip Config</button>');
-    let battleButton = $('<button type="submit" class="flip-config-battle"><i class="far fa-repeat"></i>Flip Battle Config</button>');
-    tbutton.click(async (event) => {
+function createConfigButton({className, label, onClick}) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.innerHTML = `<i class="far fa-repeat"></i>${label}`;
+    button.addEventListener("click", async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        new FlipFormApplication(app.document || app.actor).render(true);
+        await onClick();
     });
-    battleButton.click(async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        new FlipBattleFormApplication(app.document || app.actor).render(true);
-    });
-    $html.find(".tab[data-tab='identity']").prepend(battleButton);
-    $html.find(".tab[data-tab='identity']").prepend(tbutton);
+    return button;
 }
 
-Hooks.on("renderPrototypeTokenConfig", async (app, html) => {
-    if (!app?.actor) {
+function renderConfigButtons(app, element) {
+    const actorDocument = app.actor ?? app.document?.actor;
+    const identityTab = element.querySelector(".tab[data-tab='identity']");
+    if (!actorDocument || !identityTab) {
         return;
     }
-    _renderConfig(app, html);
-});
 
-Hooks.on("renderTokenConfig", async (app, html) => {
-    if (!app.document?.actor) {
-        return;
-    }
-    _renderConfig(app, html);
-});
+    identityTab.querySelector(".flip-config")?.remove();
+    identityTab.querySelector(".flip-config-battle")?.remove();
 
-Hooks.on("renderTokenHUD", (hud, _hudHtml, hudData) => {
-    let hudHtml = $(_hudHtml)
-
-    let tbutton = $(BUTTON_HTML);
-    tbutton.find(".fa-repeat").contextmenu(async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        $(event.currentTarget).parent().find('.flip-tokens').addClass("active");
+    const flipButton = createConfigButton({
+        className: "flip-config",
+        label: "Flip Config",
+        onClick: () => new FlipFormApplication(actorDocument).render(true)
     });
-    tbutton.find(".fa-repeat").click(async (event) => {
+    const battleButton = createConfigButton({
+        className: "flip-config-battle",
+        label: "Flip Battle Config",
+        onClick: () => new FlipBattleFormApplication(actorDocument).render(true)
+    });
+
+    identityTab.prepend(battleButton);
+    identityTab.prepend(flipButton);
+}
+
+function getTokenFlagValues(actorDocument) {
+    return actorDocument?.getFlag('pf2e-flip-token', 'tokens')?.values ?? [];
+}
+
+function getCurrentTokenIndex(actorDocument) {
+    return actorDocument?.getFlag('pf2e-flip-token', 'tokens')?.idx ?? 0;
+}
+
+function createFlipTokenEntry(hud, value, index) {
+    const picture = document.createElement("picture");
+    picture.classList.add("flip-token");
+    picture.dataset.idx = String(index);
+
+    const icon = document.createElement("img");
+    icon.src = value.path;
+    icon.addEventListener("click", async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        let values = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.values;
-        if (values) {
-            let idx = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.idx;
-            if ((idx + 1) < values.length) {
-                await updateToken(hud, (idx + 1), values[idx + 1].path, values[idx + 1]?.scale ?? 1, values[idx + 1].portrait, values[idx + 1].name)
-            } else {
-                await updateToken(hud, 0, values[0].path, values[0]?.scale ?? 1, values[0].portrait, values[0].name)
-            }
+        await updateTokenDocument(hud.object.document, index, value.path, value?.scale ?? 1, value?.portrait, value?.name);
+    });
+
+    picture.append(icon);
+    return picture;
+}
+
+function createHudButton(hud) {
+    const button = document.createElement("div");
+    button.classList.add("control-icon");
+    button.dataset.action = "flip";
+
+    const icon = document.createElement("i");
+    icon.className = "fas fa-repeat";
+
+    const tokenList = document.createElement("div");
+    tokenList.classList.add("flip-tokens");
+
+    icon.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        tokenList.classList.add("active");
+    });
+
+    icon.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const actorDocument = hud.object.document.actor;
+        const values = getTokenFlagValues(actorDocument);
+        if (!values.length) {
+            return;
         }
+
+        const currentIdx = getCurrentTokenIndex(actorDocument);
+        const nextIdx = currentIdx + 1 < values.length ? currentIdx + 1 : 0;
+        const next = values[nextIdx];
+        await updateTokenDocument(hud.object.document, nextIdx, next.path, next?.scale ?? 1, next?.portrait, next?.name);
     });
 
-    let values = hud.object.document.actor?.getFlag('pf2e-flip-token', 'tokens')?.values ?? [];
-    values.forEach(function (value, i) {
-        const picture = document.createElement("picture");
-        picture.classList.add("flip-token");
-        picture.dataset.idx = i;
-        picture.setAttribute("src", value.path);
+    const actorDocument = hud.object.document.actor;
+    for (const [index, value] of getTokenFlagValues(actorDocument).entries()) {
+        tokenList.append(createFlipTokenEntry(hud, value, index));
+    }
 
-        const icon = document.createElement("img");
-        icon.src = value.path;
-        picture.append(icon);
-        $(picture).find('img').click(async (event) => {
-            await updateToken(hud, i, value.path, value?.scale ?? 1, value?.portrait, value?.name)
-        });
+    button.append(icon, tokenList);
+    return button;
+}
 
-        tbutton.find(".flip-tokens").append(picture);
-    });
-
-    hudHtml.find(".col.right").append(tbutton);
+Hooks.on("renderPrototypeTokenConfig", async (app, element) => {
+    renderConfigButtons(app, element);
 });
 
-function updateBattleToken(tokenDocument, path, scale, portrait, name) {
-    if (!scale) {
-        scale = 1;
+Hooks.on("renderTokenConfig", async (app, element) => {
+    renderConfigButtons(app, element);
+});
+
+Hooks.on("renderTokenHUD", (hud, element) => {
+    const controlsColumn = element.querySelector(".col.right");
+    if (!controlsColumn || !hud.object?.document?.actor) {
+        return;
     }
 
-    if (tokenDocument?.ring?.enabled) {
-        tokenDocument.update({
-            "ring.subject": {
-                "scale": scale,
-                "texture": path
-            },
-        }, {
-            animation: {
-                transition: "morph",
-                duration: 500
-            }
-        });
-    } else {
-        tokenDocument.update({
-            "texture.src": path,
-            "texture.scaleX": scale,
-            "texture.scaleY": scale
-        }, {
-            animation: {
-                transition: "morph",
-                duration: 500
-            }
-        });
-    }
-
-    if (portrait) {
-        tokenDocument.actor.update({
-            img: portrait
-        })
-    }
-
-    if (name) {
-        tokenDocument.update({
-            name: name
-        })
-    }
-}
+    controlsColumn.querySelector("[data-action='flip']")?.remove();
+    controlsColumn.append(createHudButton(hud));
+});
 
 Hooks.on("combatStart", async (combat) => {
-    combat.turns.forEach(c => {
-        let battle = c.actor.getFlag('pf2e-flip-token', 'battle');
-        if (battle) {
-            let {path, scale, portrait, name} = battle?.inCombat;
-            updateBattleToken(c.token, path, scale, portrait, name);
+    for (const combatant of combat.turns) {
+        const actorDocument = getActorDocument(combatant.actor);
+        const battle = actorDocument?.getFlag('pf2e-flip-token', 'battle');
+        if (!battle?.inCombat || !combatant.token) {
+            continue;
         }
-    })
+
+        const {path, scale, portrait, name} = battle.inCombat;
+        await applyTokenAppearance(combatant.token, path, scale ?? 1, portrait, name);
+    }
 });
 
 Hooks.on("deleteCombat", async (combat) => {
-    combat.turns.forEach(c => {
-        let battle = c.actor.getFlag('pf2e-flip-token', 'battle');
-        if (battle) {
-            let {path, scale, portrait, name} = battle?.atRest;
-            updateBattleToken(c.token, path, scale, portrait, name);
+    for (const combatant of combat.turns) {
+        const actorDocument = getActorDocument(combatant.actor);
+        const battle = actorDocument?.getFlag('pf2e-flip-token', 'battle');
+        if (!battle?.atRest || !combatant.token) {
+            continue;
         }
-    })
+
+        const {path, scale, portrait, name} = battle.atRest;
+        await applyTokenAppearance(combatant.token, path, scale ?? 1, portrait, name);
+    }
 });
